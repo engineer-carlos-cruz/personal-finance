@@ -1,0 +1,26 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/personal_finance_prod}
+    username: ${DB_USERNAME:prod_user}
+    password: ${DB_PASSWORD:change_me}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  sql:
+    init:
+      mode: never
+
+logging:
+  level:
+    root: INFO

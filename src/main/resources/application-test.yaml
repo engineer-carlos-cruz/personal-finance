@@ -1,0 +1,22 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/personal_finance_test
+    username: test_user
+    password: test_pass_123
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  sql:
+    init:
+      mode: always
