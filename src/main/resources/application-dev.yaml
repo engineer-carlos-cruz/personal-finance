@@ -21,6 +21,12 @@ spring:
     init:
       mode: always
 
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    clean-disabled: true
+
 logging:
   level:
     org.hibernate.SQL: DEBUG

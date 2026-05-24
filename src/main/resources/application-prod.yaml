@@ -21,6 +21,12 @@ spring:
     init:
       mode: never
 
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    clean-disabled: true
+
 logging:
   level:
     root: INFO
