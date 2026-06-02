@@ -2,6 +2,7 @@ package com.ccruz.personal_finance.transfer.persistence;
 
 import com.ccruz.personal_finance.account.persistence.Account;
 import jakarta.persistence.Column;
+import jakarta.persistence.CheckConstraint;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
@@ -20,7 +21,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Check;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -31,9 +31,10 @@ import java.time.LocalDate;
     indexes = {
         @Index(name = "idx_transfers_source_account", columnList = "source_account_id"),
         @Index(name = "idx_transfers_target_account", columnList = "target_account_id")
-    }
-)
-@Check(constraints = "source_account_id <> target_account_id")
+    },
+    check = {
+        @CheckConstraint(constraint = "source_account_id <> target_account_id")
+    })
 @Getter
 @Setter
 @NoArgsConstructor
