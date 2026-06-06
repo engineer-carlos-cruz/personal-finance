@@ -1,7 +1,7 @@
+-- -----------------------------------------------------------------------------
 -- V8__seed_initial_data.sql
+-- -----------------------------------------------------------------------------
 --
--- Seed reference data for accounts, income categories, and expense categories.
-
 -- Deployment considerations:
 --   - Safe to run after V1–V7 have been applied.
 --   - Uses ON CONFLICT so it is idempotent if ever re-applied manually.
