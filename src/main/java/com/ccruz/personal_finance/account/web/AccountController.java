@@ -4,7 +4,7 @@ import com.ccruz.personal_finance.account.persistence.Account;
 import com.ccruz.personal_finance.account.service.AccountService;
 import com.ccruz.personal_finance.account.web.dto.AccountUpsertRequest;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -28,29 +29,33 @@ public class AccountController {
     }
 
     @GetMapping
-    public List<Account> findAll() {
-        return accountService.findAll();
+    public ResponseEntity<List<Account>> findAll() {
+        return ResponseEntity.ok(accountService.findAll());
     }
 
     @GetMapping("/{id}")
-    public Account findById(@PathVariable Long id) {
-        return accountService.findById(id);
+    public ResponseEntity<Account> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(accountService.findById(id));
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Account create(@Valid @RequestBody AccountUpsertRequest request) {
-        return accountService.create(request);
+    public ResponseEntity<Account> create(@Valid @RequestBody AccountUpsertRequest request) {
+        Account created = accountService.create(request);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(created.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(created);
     }
 
     @PutMapping("/{id}")
-    public Account update(@PathVariable Long id, @Valid @RequestBody AccountUpsertRequest request) {
-        return accountService.update(id, request);
+    public ResponseEntity<Account> update(@PathVariable Long id, @Valid @RequestBody AccountUpsertRequest request) {
+        return ResponseEntity.ok(accountService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         accountService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
