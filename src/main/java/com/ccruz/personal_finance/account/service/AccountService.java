@@ -30,6 +30,17 @@ public class AccountService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
     }
 
+    @Transactional(readOnly = true)
+    public Account findByCode(String code) {
+        return accountRepository.findByCode(code)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found by code"));
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsByCode(String code) {
+        return accountRepository.existsByCode(code);
+    }
+
     @Transactional
     public Account create(AccountUpsertRequest request) {
         if (accountRepository.existsByCode(request.code())) {
