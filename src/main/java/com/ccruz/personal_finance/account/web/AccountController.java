@@ -38,6 +38,16 @@ public class AccountController {
         return ResponseEntity.ok(accountService.findById(id));
     }
 
+    @GetMapping("/by-code/{code}")
+    public ResponseEntity<Account> findByCode(@PathVariable String code) {
+        return ResponseEntity.ok(accountService.findByCode(code));
+    }
+
+    @GetMapping("/by-code/{code}/exists")
+    public ResponseEntity<Boolean> existsByCode(@PathVariable String code) {
+        return ResponseEntity.ok(accountService.existsByCode(code));
+    }
+
     @PostMapping
     public ResponseEntity<Account> create(@Valid @RequestBody AccountUpsertRequest request) {
         Account created = accountService.create(request);
