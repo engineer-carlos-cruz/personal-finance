@@ -39,4 +39,8 @@ public class ExpenseCategory {
     @Size(max = 255)
     @Column(name = "description", length = 255)
     private String description;
+
+    @Builder.Default
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true;
 }
