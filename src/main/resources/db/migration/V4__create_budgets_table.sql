@@ -9,6 +9,7 @@ CREATE TABLE budgets (
     initial_date        DATE            NOT NULL,
     final_date          DATE            NOT NULL,
     state               VARCHAR(20)     NOT NULL DEFAULT 'NOT_STARTED',
+    is_active           BOOLEAN         NOT NULL DEFAULT TRUE,
 
     CONSTRAINT fk_budgets_expense_category
         FOREIGN KEY (expense_category_id)

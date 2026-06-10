@@ -68,4 +68,8 @@ public class Budget {
     @ColumnDefault("'NOT_STARTED'")
     @Column(name = "state", nullable = false, length = 20)
     private BudgetState state;
+
+    @Builder.Default
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true;
 }
