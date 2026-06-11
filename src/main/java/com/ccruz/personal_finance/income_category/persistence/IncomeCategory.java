@@ -14,9 +14,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "income_categories")
+@SQLDelete(sql = "UPDATE income_categories SET is_active = false WHERE id = ?")
+@SQLRestriction("is_active = true")
 @Getter
 @Setter
 @NoArgsConstructor
