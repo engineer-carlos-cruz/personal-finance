@@ -33,6 +33,11 @@ public class AccountController {
         return ResponseEntity.ok(accountService.findAll());
     }
 
+    @GetMapping("/with-inactive")
+    public ResponseEntity<List<Account>> findAllIncludingInactive() {
+        return ResponseEntity.ok(accountService.findAllIncludingInactive());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Account> findById(@PathVariable Long id) {
         return ResponseEntity.ok(accountService.findById(id));
