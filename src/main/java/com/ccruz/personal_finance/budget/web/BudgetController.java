@@ -32,6 +32,11 @@ public class BudgetController {
         return budgetService.findAll();
     }
 
+    @GetMapping("/with-inactive")
+    public List<Budget> findAllIncludingInactive() {
+        return budgetService.findAllIncludingInactive();
+    }
+
     @GetMapping("/{id}")
     public Budget findById(@PathVariable Long id) {
         return budgetService.findById(id);
