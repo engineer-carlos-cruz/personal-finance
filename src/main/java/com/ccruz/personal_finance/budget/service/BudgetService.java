@@ -30,6 +30,11 @@ public class BudgetService {
     }
 
     @Transactional(readOnly = true)
+    public List<Budget> findAllIncludingInactive() {
+        return budgetRepository.findAllIncludingInactive();
+    }
+
+    @Transactional(readOnly = true)
     public Budget findById(Long id) {
         return budgetRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Budget not found"));
