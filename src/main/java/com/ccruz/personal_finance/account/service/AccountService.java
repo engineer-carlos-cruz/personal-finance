@@ -25,6 +25,11 @@ public class AccountService {
     }
 
     @Transactional(readOnly = true)
+    public List<Account> findAllIncludingInactive() {
+        return accountRepository.findAllIncludingInactive();
+    }
+
+    @Transactional(readOnly = true)
     public Account findById(Long id) {
         return accountRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
