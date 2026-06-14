@@ -32,6 +32,11 @@ public class ExpenseCategoryController {
         return expenseCategoryService.findAll();
     }
 
+    @GetMapping("/with-inactive")
+    public List<ExpenseCategory> findAllIncludingInactive() {
+        return expenseCategoryService.findAllIncludingInactive();
+    }
+
     @GetMapping("/{id}")
     public ExpenseCategory findById(@PathVariable Long id) {
         return expenseCategoryService.findById(id);
