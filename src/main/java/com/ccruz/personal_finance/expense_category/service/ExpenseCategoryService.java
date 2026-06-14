@@ -25,6 +25,11 @@ public class ExpenseCategoryService {
     }
 
     @Transactional(readOnly = true)
+    public List<ExpenseCategory> findAllIncludingInactive() {
+        return expenseCategoryRepository.findAllIncludingInactive();
+    }
+
+    @Transactional(readOnly = true)
     public ExpenseCategory findById(Long id) {
         return expenseCategoryRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Expense category not found"));
