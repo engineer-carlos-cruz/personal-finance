@@ -25,6 +25,11 @@ public class IncomeCategoryService {
     }
 
     @Transactional(readOnly = true)
+    public List<IncomeCategory> findAllIncludingInactive() {
+        return incomeCategoryRepository.findAllIncludingInactive();
+    }
+
+    @Transactional(readOnly = true)
     public IncomeCategory findById(Long id) {
         return incomeCategoryRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Income category not found"));
