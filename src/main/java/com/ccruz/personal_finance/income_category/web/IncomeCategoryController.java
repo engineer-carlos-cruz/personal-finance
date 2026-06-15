@@ -32,6 +32,11 @@ public class IncomeCategoryController {
         return incomeCategoryService.findAll();
     }
 
+    @GetMapping("/with-inactive")
+    public List<IncomeCategory> findAllIncludingInactive() {
+        return incomeCategoryService.findAllIncludingInactive();
+    }
+
     @GetMapping("/{id}")
     public IncomeCategory findById(@PathVariable Long id) {
         return incomeCategoryService.findById(id);
