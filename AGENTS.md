@@ -9,7 +9,7 @@
 ## Toolchain and runtime facts
 - Requires Java toolchain 25 (`build.gradle` sets `JavaLanguageVersion.of(25)`).
 - Use Gradle wrapper (`./gradlew`), not a system Gradle.
-- Spring Boot version is `4.0.6`; Gradle wrapper is `9.4.1`.
+- Spring Boot version is `4.1.0`; Gradle wrapper is `9.4.1`.
 
 ## Profiles and database behavior
 - Default profile is `dev` (`src/main/resources/application.yaml`), so app startup and unqualified tests hit local Postgres `personal_finance_dev`.
