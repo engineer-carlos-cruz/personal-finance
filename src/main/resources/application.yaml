@@ -10,7 +10,7 @@ spring:
       ddl-auto: validate
     properties:
       hibernate:
-        format_sql: true
+        '[format_sql]': true
 
 server:
   port: ${SERVER_PORT:4545}
