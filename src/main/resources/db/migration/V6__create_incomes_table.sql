@@ -9,6 +9,7 @@ CREATE TABLE incomes (
     amount              NUMERIC(19, 2)  NOT NULL,
     date                DATE            NOT NULL,
     description         VARCHAR(255),
+    is_active           BOOLEAN         NOT NULL DEFAULT TRUE,
 
     CONSTRAINT fk_incomes_income_category
         FOREIGN KEY (income_category_id)
