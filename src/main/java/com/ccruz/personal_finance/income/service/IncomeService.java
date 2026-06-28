@@ -33,6 +33,11 @@ public class IncomeService {
     }
 
     @Transactional(readOnly = true)
+    public List<Income> findAllIncludingInactive() {
+        return incomeRepository.findAllIncludingInactive();
+    }
+
+    @Transactional(readOnly = true)
     public Income findById(Long id) {
         return incomeRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Income not found"));
