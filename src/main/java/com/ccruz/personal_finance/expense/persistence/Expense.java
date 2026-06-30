@@ -16,6 +16,8 @@ import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -27,6 +29,8 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "expenses")
+@SQLDelete(sql = "UPDATE expenses SET is_active = false WHERE id = ?")
+@SQLRestriction("is_active = true")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -63,4 +67,8 @@ public class Expense {
     @Size(max = 255)
     @Column(name = "description", length = 255)
     private String description;
+
+    @Builder.Default
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true;
 }
