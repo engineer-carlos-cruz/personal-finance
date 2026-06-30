@@ -9,6 +9,7 @@ CREATE TABLE expenses (
     amount              NUMERIC(19, 2)  NOT NULL,
     date                DATE            NOT NULL,
     description         VARCHAR(255),
+    is_active           BOOLEAN         NOT NULL DEFAULT TRUE,
 
     CONSTRAINT fk_expenses_expense_category
         FOREIGN KEY (expense_category_id)
