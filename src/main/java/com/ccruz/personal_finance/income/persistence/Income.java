@@ -13,7 +13,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Digits;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import jakarta.validation.constraints.NotNull;
