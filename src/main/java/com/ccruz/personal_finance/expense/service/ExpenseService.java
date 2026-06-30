@@ -33,6 +33,11 @@ public class ExpenseService {
     }
 
     @Transactional(readOnly = true)
+    public List<Expense> findAllIncludingInactive() {
+        return expenseRepository.findAllIncludingInactive();
+    }
+
+    @Transactional(readOnly = true)
     public Expense findById(Long id) {
         return expenseRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Expense not found"));
