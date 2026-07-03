@@ -2,6 +2,7 @@ package com.ccruz.personal_finance.account.web;
 
 import com.ccruz.personal_finance.account.persistence.Account;
 import com.ccruz.personal_finance.account.service.AccountService;
+import com.ccruz.personal_finance.account.web.dto.AccountResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -32,6 +34,9 @@ class AccountControllerTest {
 
     @Mock
     private AccountService accountService;
+
+    @Mock
+    private AccountMapper accountMapper;
 
     @InjectMocks
     private AccountController accountController;
@@ -60,8 +65,11 @@ class AccountControllerTest {
                 .balance(new BigDecimal("5000.00"))
                 .isActive(true)
                 .build();
+        var cashResponse = new AccountResponse(1L, "CASH", "Cash account", new BigDecimal("1000.00"));
+        var bankResponse = new AccountResponse(2L, "BANK", "Bank account", new BigDecimal("5000.00"));
 
         when(accountService.findAll()).thenReturn(List.of(cash, bank));
+        when(accountMapper.toResponse(anyList())).thenReturn(List.of(cashResponse, bankResponse));
 
         mockMvc.perform(get("/api/accounts").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -79,6 +87,7 @@ class AccountControllerTest {
     @DisplayName("findAll should return 200 with empty list when no accounts exist")
     void findAll_shouldReturn200WithEmptyList() throws Exception {
         when(accountService.findAll()).thenReturn(List.of());
+        when(accountMapper.toResponse(anyList())).thenReturn(List.of());
 
         mockMvc.perform(get("/api/accounts").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -104,8 +113,11 @@ class AccountControllerTest {
                 .balance(new BigDecimal("5000.00"))
                 .isActive(false)
                 .build();
+        var cashResponse = new AccountResponse(1L, "CASH", "Cash account", new BigDecimal("1000.00"));
+        var bankResponse = new AccountResponse(2L, "BANK", "Bank account", new BigDecimal("5000.00"));
 
         when(accountService.findAllIncludingInactive()).thenReturn(List.of(cash, bank));
+        when(accountMapper.toResponse(anyList())).thenReturn(List.of(cashResponse, bankResponse));
 
         mockMvc.perform(get("/api/accounts/with-inactive").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -120,6 +132,7 @@ class AccountControllerTest {
     @DisplayName("findAllIncludingInactive should return 200 with empty list")
     void findAllIncludingInactive_shouldReturn200WithEmptyList() throws Exception {
         when(accountService.findAllIncludingInactive()).thenReturn(List.of());
+        when(accountMapper.toResponse(anyList())).thenReturn(List.of());
 
         mockMvc.perform(get("/api/accounts/with-inactive").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -138,8 +151,10 @@ class AccountControllerTest {
                 .balance(new BigDecimal("1000.00"))
                 .isActive(true)
                 .build();
+        var response = new AccountResponse(1L, "CASH", "Cash account", new BigDecimal("1000.00"));
 
         when(accountService.findById(1L)).thenReturn(account);
+        when(accountMapper.toResponse(account)).thenReturn(response);
 
         mockMvc.perform(get("/api/accounts/1").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -171,8 +186,10 @@ class AccountControllerTest {
                 .balance(new BigDecimal("1000.00"))
                 .isActive(true)
                 .build();
+        var response = new AccountResponse(1L, "CASH", "Cash account", new BigDecimal("1000.00"));
 
         when(accountService.findByCode("CASH")).thenReturn(account);
+        when(accountMapper.toResponse(account)).thenReturn(response);
 
         mockMvc.perform(get("/api/accounts/by-code/CASH").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -228,8 +245,10 @@ class AccountControllerTest {
                 .balance(new BigDecimal("1000.00"))
                 .isActive(true)
                 .build();
+        var response = new AccountResponse(1L, "CASH", "Cash account", new BigDecimal("1000.00"));
 
         when(accountService.create(any())).thenReturn(created);
+        when(accountMapper.toResponse(created)).thenReturn(response);
 
         mockMvc.perform(post("/api/accounts")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -266,8 +285,10 @@ class AccountControllerTest {
                 .balance(new BigDecimal("2000.00"))
                 .isActive(true)
                 .build();
+        var response = new AccountResponse(1L, "CASH", "Updated description", new BigDecimal("2000.00"));
 
         when(accountService.update(anyLong(), any())).thenReturn(updated);
+        when(accountMapper.toResponse(updated)).thenReturn(response);
 
         mockMvc.perform(put("/api/accounts/1")
                         .contentType(MediaType.APPLICATION_JSON)
