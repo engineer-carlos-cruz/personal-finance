@@ -3,7 +3,9 @@ package com.ccruz.personal_finance.budget.web;
 import com.ccruz.personal_finance.budget.persistence.Budget;
 import com.ccruz.personal_finance.budget.persistence.BudgetState;
 import com.ccruz.personal_finance.budget.service.BudgetService;
+import com.ccruz.personal_finance.budget.web.dto.BudgetResponse;
 import com.ccruz.personal_finance.expense_category.persistence.ExpenseCategory;
+import com.ccruz.personal_finance.expense_category.web.dto.ExpenseCategoryResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +24,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -40,6 +43,9 @@ class BudgetControllerTest {
     @Mock
     private BudgetService budgetService;
 
+    @Mock
+    private BudgetMapper budgetMapper;
+
     @InjectMocks
     private BudgetController budgetController;
 
@@ -47,6 +53,8 @@ class BudgetControllerTest {
 
     private ExpenseCategory category;
     private Budget budget;
+    private ExpenseCategoryResponse categoryResponse;
+    private BudgetResponse budgetResponse;
 
     @BeforeEach
     void setUp() {
@@ -68,6 +76,10 @@ class BudgetControllerTest {
                 .state(BudgetState.NOT_STARTED)
                 .isActive(true)
                 .build();
+
+        categoryResponse = new ExpenseCategoryResponse(1L, "Food", "Food expenses");
+        budgetResponse = new BudgetResponse(1L, categoryResponse, new BigDecimal("500.00"),
+                LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 31), BudgetState.NOT_STARTED);
     }
 
     @Test
@@ -82,8 +94,11 @@ class BudgetControllerTest {
                 .state(BudgetState.WITHIN)
                 .isActive(true)
                 .build();
+        var budget2Response = new BudgetResponse(2L, categoryResponse, new BigDecimal("1000.00"),
+                LocalDate.of(2026, 2, 1), LocalDate.of(2026, 2, 28), BudgetState.WITHIN);
 
         when(budgetService.findAll()).thenReturn(List.of(budget, budget2));
+        when(budgetMapper.toResponse(anyList())).thenReturn(List.of(budgetResponse, budget2Response));
 
         mockMvc.perform(get("/api/budgets").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -101,6 +116,7 @@ class BudgetControllerTest {
     @DisplayName("findAll should return 200 with empty list when no budgets exist")
     void findAll_shouldReturn200WithEmptyList() throws Exception {
         when(budgetService.findAll()).thenReturn(List.of());
+        when(budgetMapper.toResponse(anyList())).thenReturn(List.of());
 
         mockMvc.perform(get("/api/budgets").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -121,8 +137,11 @@ class BudgetControllerTest {
                 .state(BudgetState.FULLY_USED)
                 .isActive(false)
                 .build();
+        var inactiveBudgetResponse = new BudgetResponse(2L, categoryResponse, new BigDecimal("1000.00"),
+                LocalDate.of(2026, 2, 1), LocalDate.of(2026, 2, 28), BudgetState.FULLY_USED);
 
         when(budgetService.findAllIncludingInactive()).thenReturn(List.of(budget, inactiveBudget));
+        when(budgetMapper.toResponse(anyList())).thenReturn(List.of(budgetResponse, inactiveBudgetResponse));
 
         mockMvc.perform(get("/api/budgets/with-inactive").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -137,6 +156,7 @@ class BudgetControllerTest {
     @DisplayName("findAllIncludingInactive should return 200 with empty list")
     void findAllIncludingInactive_shouldReturn200WithEmptyList() throws Exception {
         when(budgetService.findAllIncludingInactive()).thenReturn(List.of());
+        when(budgetMapper.toResponse(anyList())).thenReturn(List.of());
 
         mockMvc.perform(get("/api/budgets/with-inactive").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -149,6 +169,7 @@ class BudgetControllerTest {
     @DisplayName("findById should return 200 with budget when found")
     void findById_shouldReturn200WhenFound() throws Exception {
         when(budgetService.findById(1L)).thenReturn(budget);
+        when(budgetMapper.toResponse(budget)).thenReturn(budgetResponse);
 
         mockMvc.perform(get("/api/budgets/1").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -175,6 +196,7 @@ class BudgetControllerTest {
     @DisplayName("create should return 201 with created budget")
     void create_shouldReturn201() throws Exception {
         when(budgetService.create(any())).thenReturn(budget);
+        when(budgetMapper.toResponse(budget)).thenReturn(budgetResponse);
 
         mockMvc.perform(post("/api/budgets")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -190,6 +212,7 @@ class BudgetControllerTest {
     @DisplayName("update should return 200 with updated budget")
     void update_shouldReturn200WithUpdatedBudget() throws Exception {
         when(budgetService.update(anyLong(), any())).thenReturn(budget);
+        when(budgetMapper.toResponse(budget)).thenReturn(budgetResponse);
 
         mockMvc.perform(put("/api/budgets/1")
                         .contentType(MediaType.APPLICATION_JSON)
