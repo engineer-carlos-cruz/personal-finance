@@ -1,9 +1,12 @@
 package com.ccruz.personal_finance.income.web;
 
 import com.ccruz.personal_finance.account.persistence.Account;
+import com.ccruz.personal_finance.account.web.dto.AccountResponse;
 import com.ccruz.personal_finance.income.persistence.Income;
 import com.ccruz.personal_finance.income.service.IncomeService;
+import com.ccruz.personal_finance.income.web.dto.IncomeResponse;
 import com.ccruz.personal_finance.income_category.persistence.IncomeCategory;
+import com.ccruz.personal_finance.income_category.web.dto.IncomeCategoryResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +25,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -36,6 +40,9 @@ class IncomeControllerTest {
     @Mock
     private IncomeService incomeService;
 
+    @Mock
+    private IncomeMapper incomeMapper;
+
     @InjectMocks
     private IncomeController incomeController;
 
@@ -43,6 +50,8 @@ class IncomeControllerTest {
 
     private IncomeCategory salaryCategory;
     private Account cashAccount;
+    private IncomeCategoryResponse salaryCategoryResponse;
+    private AccountResponse cashAccountResponse;
 
     @BeforeEach
     void setUp() {
@@ -59,6 +68,9 @@ class IncomeControllerTest {
                 .description("Cash account")
                 .balance(new BigDecimal("1000.00"))
                 .build();
+
+        salaryCategoryResponse = new IncomeCategoryResponse(10L, "Salary", null);
+        cashAccountResponse = new AccountResponse(20L, "CASH", "Cash account", new BigDecimal("1000.00"));
     }
 
     @Test
@@ -80,8 +92,13 @@ class IncomeControllerTest {
                 .date(LocalDate.of(2026, 6, 15))
                 .description("Bonus")
                 .build();
+        var income1Response = new IncomeResponse(1L, salaryCategoryResponse, cashAccountResponse,
+                new BigDecimal("3000.00"), LocalDate.of(2026, 6, 1), "Monthly salary");
+        var income2Response = new IncomeResponse(2L, salaryCategoryResponse, cashAccountResponse,
+                new BigDecimal("500.00"), LocalDate.of(2026, 6, 15), "Bonus");
 
         when(incomeService.findAll()).thenReturn(List.of(income1, income2));
+        when(incomeMapper.toResponse(anyList())).thenReturn(List.of(income1Response, income2Response));
 
         mockMvc.perform(get("/api/incomes").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -102,6 +119,7 @@ class IncomeControllerTest {
     @DisplayName("findAll should return 200 with empty list when no incomes exist")
     void findAll_shouldReturn200WithEmptyList() throws Exception {
         when(incomeService.findAll()).thenReturn(List.of());
+        when(incomeMapper.toResponse(anyList())).thenReturn(List.of());
 
         mockMvc.perform(get("/api/incomes").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -130,8 +148,13 @@ class IncomeControllerTest {
                 .description("Inactive")
                 .isActive(false)
                 .build();
+        var activeResponse = new IncomeResponse(1L, salaryCategoryResponse, cashAccountResponse,
+                new BigDecimal("3000.00"), LocalDate.of(2026, 6, 1), "Active");
+        var inactiveResponse = new IncomeResponse(2L, salaryCategoryResponse, cashAccountResponse,
+                new BigDecimal("500.00"), LocalDate.of(2026, 6, 15), "Inactive");
 
         when(incomeService.findAllIncludingInactive()).thenReturn(List.of(active, inactive));
+        when(incomeMapper.toResponse(anyList())).thenReturn(List.of(activeResponse, inactiveResponse));
 
         mockMvc.perform(get("/api/incomes/with-inactive").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -146,6 +169,7 @@ class IncomeControllerTest {
     @DisplayName("findAllIncludingInactive should return 200 with empty list")
     void findAllIncludingInactive_shouldReturn200WithEmptyList() throws Exception {
         when(incomeService.findAllIncludingInactive()).thenReturn(List.of());
+        when(incomeMapper.toResponse(anyList())).thenReturn(List.of());
 
         mockMvc.perform(get("/api/incomes/with-inactive").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -165,8 +189,11 @@ class IncomeControllerTest {
                 .date(LocalDate.of(2026, 6, 1))
                 .description("Monthly salary")
                 .build();
+        var response = new IncomeResponse(1L, salaryCategoryResponse, cashAccountResponse,
+                new BigDecimal("3000.00"), LocalDate.of(2026, 6, 1), "Monthly salary");
 
         when(incomeService.findById(1L)).thenReturn(income);
+        when(incomeMapper.toResponse(income)).thenReturn(response);
 
         mockMvc.perform(get("/api/incomes/1").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -202,8 +229,11 @@ class IncomeControllerTest {
                 .date(LocalDate.of(2026, 6, 1))
                 .description("Monthly salary")
                 .build();
+        var response = new IncomeResponse(1L, salaryCategoryResponse, cashAccountResponse,
+                new BigDecimal("3000.00"), LocalDate.of(2026, 6, 1), "Monthly salary");
 
         when(incomeService.create(any())).thenReturn(created);
+        when(incomeMapper.toResponse(created)).thenReturn(response);
 
         mockMvc.perform(post("/api/incomes")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -228,8 +258,11 @@ class IncomeControllerTest {
                 .date(LocalDate.of(2026, 7, 1))
                 .description("Updated salary")
                 .build();
+        var response = new IncomeResponse(1L, salaryCategoryResponse, cashAccountResponse,
+                new BigDecimal("3500.00"), LocalDate.of(2026, 7, 1), "Updated salary");
 
         when(incomeService.update(anyLong(), any())).thenReturn(updated);
+        when(incomeMapper.toResponse(updated)).thenReturn(response);
 
         mockMvc.perform(put("/api/incomes/1")
                         .contentType(MediaType.APPLICATION_JSON)

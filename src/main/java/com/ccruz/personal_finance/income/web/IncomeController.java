@@ -1,7 +1,7 @@
 package com.ccruz.personal_finance.income.web;
 
-import com.ccruz.personal_finance.income.persistence.Income;
 import com.ccruz.personal_finance.income.service.IncomeService;
+import com.ccruz.personal_finance.income.web.dto.IncomeResponse;
 import com.ccruz.personal_finance.income.web.dto.IncomeUpsertRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -23,39 +23,41 @@ import java.util.List;
 public class IncomeController {
 
     private final IncomeService incomeService;
+    private final IncomeMapper incomeMapper;
 
-    public IncomeController(IncomeService incomeService) {
+    public IncomeController(IncomeService incomeService, IncomeMapper incomeMapper) {
         this.incomeService = incomeService;
+        this.incomeMapper = incomeMapper;
     }
 
     @GetMapping
-    public ResponseEntity<List<Income>> findAll() {
-        return ResponseEntity.ok(incomeService.findAll());
+    public ResponseEntity<List<IncomeResponse>> findAll() {
+        return ResponseEntity.ok(incomeMapper.toResponse(incomeService.findAll()));
     }
 
     @GetMapping("/with-inactive")
-    public ResponseEntity<List<Income>> findAllIncludingInactive() {
-        return ResponseEntity.ok(incomeService.findAllIncludingInactive());
+    public ResponseEntity<List<IncomeResponse>> findAllIncludingInactive() {
+        return ResponseEntity.ok(incomeMapper.toResponse(incomeService.findAllIncludingInactive()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Income> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(incomeService.findById(id));
+    public ResponseEntity<IncomeResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(incomeMapper.toResponse(incomeService.findById(id)));
     }
 
     @PostMapping
-    public ResponseEntity<Income> create(@Valid @RequestBody IncomeUpsertRequest request) {
-        Income created = incomeService.create(request);
+    public ResponseEntity<IncomeResponse> create(@Valid @RequestBody IncomeUpsertRequest request) {
+        var created = incomeService.create(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(created.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(created);
+        return ResponseEntity.created(location).body(incomeMapper.toResponse(created));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Income> update(@PathVariable Long id, @Valid @RequestBody IncomeUpsertRequest request) {
-        return ResponseEntity.ok(incomeService.update(id, request));
+    public ResponseEntity<IncomeResponse> update(@PathVariable Long id, @Valid @RequestBody IncomeUpsertRequest request) {
+        return ResponseEntity.ok(incomeMapper.toResponse(incomeService.update(id, request)));
     }
 
     @DeleteMapping("/{id}")
