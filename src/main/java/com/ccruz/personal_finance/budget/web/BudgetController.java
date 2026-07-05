@@ -1,7 +1,7 @@
 package com.ccruz.personal_finance.budget.web;
 
-import com.ccruz.personal_finance.budget.persistence.Budget;
 import com.ccruz.personal_finance.budget.service.BudgetService;
+import com.ccruz.personal_finance.budget.web.dto.BudgetResponse;
 import com.ccruz.personal_finance.budget.web.dto.BudgetUpsertRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -22,35 +22,37 @@ import java.util.List;
 public class BudgetController {
 
     private final BudgetService budgetService;
+    private final BudgetMapper budgetMapper;
 
-    public BudgetController(BudgetService budgetService) {
+    public BudgetController(BudgetService budgetService, BudgetMapper budgetMapper) {
         this.budgetService = budgetService;
+        this.budgetMapper = budgetMapper;
     }
 
     @GetMapping
-    public List<Budget> findAll() {
-        return budgetService.findAll();
+    public List<BudgetResponse> findAll() {
+        return budgetMapper.toResponse(budgetService.findAll());
     }
 
     @GetMapping("/with-inactive")
-    public List<Budget> findAllIncludingInactive() {
-        return budgetService.findAllIncludingInactive();
+    public List<BudgetResponse> findAllIncludingInactive() {
+        return budgetMapper.toResponse(budgetService.findAllIncludingInactive());
     }
 
     @GetMapping("/{id}")
-    public Budget findById(@PathVariable Long id) {
-        return budgetService.findById(id);
+    public BudgetResponse findById(@PathVariable Long id) {
+        return budgetMapper.toResponse(budgetService.findById(id));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Budget create(@Valid @RequestBody BudgetUpsertRequest request) {
-        return budgetService.create(request);
+    public BudgetResponse create(@Valid @RequestBody BudgetUpsertRequest request) {
+        return budgetMapper.toResponse(budgetService.create(request));
     }
 
     @PutMapping("/{id}")
-    public Budget update(@PathVariable Long id, @Valid @RequestBody BudgetUpsertRequest request) {
-        return budgetService.update(id, request);
+    public BudgetResponse update(@PathVariable Long id, @Valid @RequestBody BudgetUpsertRequest request) {
+        return budgetMapper.toResponse(budgetService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
