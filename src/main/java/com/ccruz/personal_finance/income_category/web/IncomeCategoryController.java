@@ -1,7 +1,7 @@
 package com.ccruz.personal_finance.income_category.web;
 
-import com.ccruz.personal_finance.income_category.persistence.IncomeCategory;
 import com.ccruz.personal_finance.income_category.service.IncomeCategoryService;
+import com.ccruz.personal_finance.income_category.web.dto.IncomeCategoryResponse;
 import com.ccruz.personal_finance.income_category.web.dto.IncomeCategoryUpsertRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -22,35 +22,37 @@ import java.util.List;
 public class IncomeCategoryController {
 
     private final IncomeCategoryService incomeCategoryService;
+    private final IncomeCategoryMapper incomeCategoryMapper;
 
-    public IncomeCategoryController(IncomeCategoryService incomeCategoryService) {
+    public IncomeCategoryController(IncomeCategoryService incomeCategoryService, IncomeCategoryMapper incomeCategoryMapper) {
         this.incomeCategoryService = incomeCategoryService;
+        this.incomeCategoryMapper = incomeCategoryMapper;
     }
 
     @GetMapping
-    public List<IncomeCategory> findAll() {
-        return incomeCategoryService.findAll();
+    public List<IncomeCategoryResponse> findAll() {
+        return incomeCategoryMapper.toResponse(incomeCategoryService.findAll());
     }
 
     @GetMapping("/with-inactive")
-    public List<IncomeCategory> findAllIncludingInactive() {
-        return incomeCategoryService.findAllIncludingInactive();
+    public List<IncomeCategoryResponse> findAllIncludingInactive() {
+        return incomeCategoryMapper.toResponse(incomeCategoryService.findAllIncludingInactive());
     }
 
     @GetMapping("/{id}")
-    public IncomeCategory findById(@PathVariable Long id) {
-        return incomeCategoryService.findById(id);
+    public IncomeCategoryResponse findById(@PathVariable Long id) {
+        return incomeCategoryMapper.toResponse(incomeCategoryService.findById(id));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public IncomeCategory create(@Valid @RequestBody IncomeCategoryUpsertRequest request) {
-        return incomeCategoryService.create(request);
+    public IncomeCategoryResponse create(@Valid @RequestBody IncomeCategoryUpsertRequest request) {
+        return incomeCategoryMapper.toResponse(incomeCategoryService.create(request));
     }
 
     @PutMapping("/{id}")
-    public IncomeCategory update(@PathVariable Long id, @Valid @RequestBody IncomeCategoryUpsertRequest request) {
-        return incomeCategoryService.update(id, request);
+    public IncomeCategoryResponse update(@PathVariable Long id, @Valid @RequestBody IncomeCategoryUpsertRequest request) {
+        return incomeCategoryMapper.toResponse(incomeCategoryService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
