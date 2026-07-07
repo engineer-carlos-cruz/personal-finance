@@ -2,6 +2,7 @@ package com.ccruz.personal_finance.income_category.web;
 
 import com.ccruz.personal_finance.income_category.persistence.IncomeCategory;
 import com.ccruz.personal_finance.income_category.service.IncomeCategoryService;
+import com.ccruz.personal_finance.income_category.web.dto.IncomeCategoryResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -37,9 +39,12 @@ class IncomeCategoryControllerWebMvcTest {
     @Autowired
     private IncomeCategoryService incomeCategoryService;
 
+    @Autowired
+    private IncomeCategoryMapper incomeCategoryMapper;
+
     @BeforeEach
     void setUp() {
-        Mockito.reset(incomeCategoryService);
+        Mockito.reset(incomeCategoryService, incomeCategoryMapper);
     }
 
     @Test
@@ -57,8 +62,11 @@ class IncomeCategoryControllerWebMvcTest {
                 .description("Freelance income")
                 .isActive(true)
                 .build();
+        var salaryResponse = new IncomeCategoryResponse(1L, "Salary", "Monthly salary");
+        var freelanceResponse = new IncomeCategoryResponse(2L, "Freelance", "Freelance income");
 
         when(incomeCategoryService.findAll()).thenReturn(List.of(salary, freelance));
+        when(incomeCategoryMapper.toResponse(anyList())).thenReturn(List.of(salaryResponse, freelanceResponse));
 
         mockMvc.perform(get("/api/income-categories").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -76,6 +84,7 @@ class IncomeCategoryControllerWebMvcTest {
     @DisplayName("findAll should return 200 with empty list when no categories exist")
     void findAll_shouldReturn200WithEmptyList() throws Exception {
         when(incomeCategoryService.findAll()).thenReturn(List.of());
+        when(incomeCategoryMapper.toResponse(anyList())).thenReturn(List.of());
 
         mockMvc.perform(get("/api/income-categories").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -99,8 +108,11 @@ class IncomeCategoryControllerWebMvcTest {
                 .description("Inactive category")
                 .isActive(false)
                 .build();
+        var salaryResponse = new IncomeCategoryResponse(1L, "Salary", "Monthly salary");
+        var inactiveResponse = new IncomeCategoryResponse(2L, "Old Category", "Inactive category");
 
         when(incomeCategoryService.findAllIncludingInactive()).thenReturn(List.of(salary, inactive));
+        when(incomeCategoryMapper.toResponse(anyList())).thenReturn(List.of(salaryResponse, inactiveResponse));
 
         mockMvc.perform(get("/api/income-categories/with-inactive").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -115,6 +127,7 @@ class IncomeCategoryControllerWebMvcTest {
     @DisplayName("findAllIncludingInactive should return 200 with empty list")
     void findAllIncludingInactive_shouldReturn200WithEmptyList() throws Exception {
         when(incomeCategoryService.findAllIncludingInactive()).thenReturn(List.of());
+        when(incomeCategoryMapper.toResponse(anyList())).thenReturn(List.of());
 
         mockMvc.perform(get("/api/income-categories/with-inactive").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -132,8 +145,10 @@ class IncomeCategoryControllerWebMvcTest {
                 .description("Monthly salary")
                 .isActive(true)
                 .build();
+        var response = new IncomeCategoryResponse(1L, "Salary", "Monthly salary");
 
         when(incomeCategoryService.findById(1L)).thenReturn(category);
+        when(incomeCategoryMapper.toResponse(category)).thenReturn(response);
 
         mockMvc.perform(get("/api/income-categories/1").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -164,8 +179,10 @@ class IncomeCategoryControllerWebMvcTest {
                 .description("Monthly salary")
                 .isActive(true)
                 .build();
+        var response = new IncomeCategoryResponse(1L, "Salary", "Monthly salary");
 
         when(incomeCategoryService.create(any())).thenReturn(created);
+        when(incomeCategoryMapper.toResponse(created)).thenReturn(response);
 
         mockMvc.perform(post("/api/income-categories")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -195,8 +212,10 @@ class IncomeCategoryControllerWebMvcTest {
                 .description("Updated description")
                 .isActive(true)
                 .build();
+        var response = new IncomeCategoryResponse(1L, "Salary", "Updated description");
 
         when(incomeCategoryService.update(anyLong(), any())).thenReturn(updated);
+        when(incomeCategoryMapper.toResponse(updated)).thenReturn(response);
 
         mockMvc.perform(put("/api/income-categories/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -257,6 +276,11 @@ class IncomeCategoryControllerWebMvcTest {
         @Bean
         IncomeCategoryService incomeCategoryService() {
             return Mockito.mock(IncomeCategoryService.class);
+        }
+
+        @Bean
+        IncomeCategoryMapper incomeCategoryMapper() {
+            return Mockito.mock(IncomeCategoryMapper.class);
         }
     }
 }
