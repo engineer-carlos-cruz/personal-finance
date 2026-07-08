@@ -2,6 +2,7 @@ package com.ccruz.personal_finance.expense_category.web;
 
 import com.ccruz.personal_finance.expense_category.persistence.ExpenseCategory;
 import com.ccruz.personal_finance.expense_category.service.ExpenseCategoryService;
+import com.ccruz.personal_finance.expense_category.web.dto.ExpenseCategoryResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -31,6 +33,9 @@ class ExpenseCategoryControllerTest {
 
     @Mock
     private ExpenseCategoryService expenseCategoryService;
+
+    @Mock
+    private ExpenseCategoryMapper expenseCategoryMapper;
 
     @InjectMocks
     private ExpenseCategoryController expenseCategoryController;
@@ -57,8 +62,11 @@ class ExpenseCategoryControllerTest {
                 .description("Transport expenses")
                 .isActive(true)
                 .build();
+        var foodResponse = new ExpenseCategoryResponse(1L, "Food", "Food expenses");
+        var transportResponse = new ExpenseCategoryResponse(2L, "Transport", "Transport expenses");
 
         when(expenseCategoryService.findAll()).thenReturn(List.of(food, transport));
+        when(expenseCategoryMapper.toResponse(anyList())).thenReturn(List.of(foodResponse, transportResponse));
 
         mockMvc.perform(get("/api/expense-categories").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -76,6 +84,7 @@ class ExpenseCategoryControllerTest {
     @DisplayName("findAll should return 200 with empty list when no categories exist")
     void findAll_shouldReturn200WithEmptyList() throws Exception {
         when(expenseCategoryService.findAll()).thenReturn(List.of());
+        when(expenseCategoryMapper.toResponse(anyList())).thenReturn(List.of());
 
         mockMvc.perform(get("/api/expense-categories").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -99,8 +108,11 @@ class ExpenseCategoryControllerTest {
                 .description("Inactive category")
                 .isActive(false)
                 .build();
+        var foodResponse = new ExpenseCategoryResponse(1L, "Food", "Food expenses");
+        var inactiveResponse = new ExpenseCategoryResponse(2L, "Old Category", "Inactive category");
 
         when(expenseCategoryService.findAllIncludingInactive()).thenReturn(List.of(food, inactive));
+        when(expenseCategoryMapper.toResponse(anyList())).thenReturn(List.of(foodResponse, inactiveResponse));
 
         mockMvc.perform(get("/api/expense-categories/with-inactive").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -115,6 +127,7 @@ class ExpenseCategoryControllerTest {
     @DisplayName("findAllIncludingInactive should return 200 with empty list")
     void findAllIncludingInactive_shouldReturn200WithEmptyList() throws Exception {
         when(expenseCategoryService.findAllIncludingInactive()).thenReturn(List.of());
+        when(expenseCategoryMapper.toResponse(anyList())).thenReturn(List.of());
 
         mockMvc.perform(get("/api/expense-categories/with-inactive").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -132,8 +145,10 @@ class ExpenseCategoryControllerTest {
                 .description("Food expenses")
                 .isActive(true)
                 .build();
+        var response = new ExpenseCategoryResponse(1L, "Food", "Food expenses");
 
         when(expenseCategoryService.findById(1L)).thenReturn(category);
+        when(expenseCategoryMapper.toResponse(category)).thenReturn(response);
 
         mockMvc.perform(get("/api/expense-categories/1").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -164,8 +179,10 @@ class ExpenseCategoryControllerTest {
                 .description("Food expenses")
                 .isActive(true)
                 .build();
+        var response = new ExpenseCategoryResponse(1L, "Food", "Food expenses");
 
         when(expenseCategoryService.create(any())).thenReturn(created);
+        when(expenseCategoryMapper.toResponse(created)).thenReturn(response);
 
         mockMvc.perform(post("/api/expense-categories")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -186,8 +203,10 @@ class ExpenseCategoryControllerTest {
                 .description("Updated description")
                 .isActive(true)
                 .build();
+        var response = new ExpenseCategoryResponse(1L, "Food", "Updated description");
 
         when(expenseCategoryService.update(anyLong(), any())).thenReturn(updated);
+        when(expenseCategoryMapper.toResponse(updated)).thenReturn(response);
 
         mockMvc.perform(put("/api/expense-categories/1")
                         .contentType(MediaType.APPLICATION_JSON)
