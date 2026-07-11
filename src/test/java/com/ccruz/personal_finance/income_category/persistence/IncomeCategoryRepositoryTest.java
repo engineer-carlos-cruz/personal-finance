@@ -46,7 +46,7 @@ class IncomeCategoryRepositoryTest {
 
         assertThat(result)
                 .hasSize(1)
-                .extracting(IncomeCategory::getName)
+                .extracting(incomeCategory -> incomeCategory.getName())
                 .containsExactly("Salary");
     }
 }
