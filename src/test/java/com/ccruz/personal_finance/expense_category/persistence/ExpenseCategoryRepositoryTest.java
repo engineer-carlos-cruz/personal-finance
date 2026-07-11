@@ -46,7 +46,7 @@ class ExpenseCategoryRepositoryTest {
 
         assertThat(result)
                 .hasSize(1)
-                .extracting(ExpenseCategory::getName)
+                .extracting(expenseCategory -> expenseCategory.getName())
                 .containsExactly("Food");
     }
 
@@ -73,7 +73,7 @@ class ExpenseCategoryRepositoryTest {
 
         assertThat(result)
                 .hasSize(2)
-                .extracting(ExpenseCategory::getName)
+                .extracting(expenseCategory -> expenseCategory.getName())
                 .containsExactlyInAnyOrder("Food", "Old Category");
     }
 }
