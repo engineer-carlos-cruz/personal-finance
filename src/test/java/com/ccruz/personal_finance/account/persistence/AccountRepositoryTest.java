@@ -50,7 +50,7 @@ class AccountRepositoryTest {
 
         assertThat(result)
                 .hasSize(1)
-                .extracting(Account::getCode)
+                .extracting(account -> account.getCode())
                 .containsExactly("CASH");
     }
 }
